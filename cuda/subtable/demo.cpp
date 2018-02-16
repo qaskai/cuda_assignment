@@ -3,6 +3,11 @@
 #include <climits>
 #include <algorithm>
 
+#include <iostream>
+#include <chrono>
+using namespace std::chrono;
+
+
 void local_maxes(int N, CUdeviceptr table, CUdeviceptr local_max_table);
 
 
@@ -59,6 +64,9 @@ int main() {
     if (cuMemAlloc(&local_max_table, N*N * sizeof(int)) != CUDA_SUCCESS) { printf("cuMemAlloc local_max_table fail\n"); exit(-1); }
 
     parse_input(N, host_table);
+
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
     partial_sums(N, host_table);
 
     if (cuMemcpyHtoD(table, host_table, N*N * sizeof(int)) != CUDA_SUCCESS) { printf("cuMemcpyHtoD host_table --> table fail\n"); exit(-1);}
@@ -71,7 +79,12 @@ int main() {
     if (cuCtxSynchronize() != CUDA_SUCCESS) { printf("sync fail\n"); exit(-1);}
 
     int max = find_max(N, host_table);
-    printf("%d\n", max);
+    //printf("%d\n", max);
+
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    std::cout << "subtable test N=" << N << " cuda implementation took " << duration << " us" << std::endl;
 
     cuMemFree(table);
     cuMemFree(local_max_table);
