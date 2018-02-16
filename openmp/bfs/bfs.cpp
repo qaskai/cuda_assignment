@@ -1,5 +1,10 @@
 #include <cstdio>
 #include <cstdlib>
+#include <string>
+
+#include <iostream>
+#include <chrono>
+using namespace std::chrono;
 
 void gen(int seed, int * graph, int N, int dens){
     srand(seed);
@@ -48,23 +53,31 @@ int* bfs(int N, int* graph) {
     return levels;
 }
 
-int main(int argc, char const *argv[])
-{
-    
-    int N = 1024*16;
+void test(int N, std::string test_name) {
 
     int* graph = (int*) malloc(N*N * sizeof(int));
 
-    gen(12345, graph, N, 500);
+    gen(12345, graph, N, N/16);
+
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
 
     int* lev = bfs(N, graph);
-    for (int i=0; i<N; ++i) {
-        printf("%d ", lev[i]);
-    }
-    printf("\n");
+    
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    std::cout << test_name << " openmp implementation took " << duration << " us" << std::endl;
 
     free(lev);
     free(graph);
+
+}
+
+int main(int argc, char const *argv[])
+{
+	test(1024*8, "N=1024*8 bfs");
+    test(1024*16, "N=1024*16 bfs");
+    test(1024*30, "N=1024*30 bfs");
 
     return 0;
 }
