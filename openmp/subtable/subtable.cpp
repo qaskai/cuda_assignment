@@ -3,6 +3,9 @@
 #include <climits>
 #include <cstdlib>
 
+#include <iostream>
+#include <chrono>
+using namespace std::chrono;
 
 void parse_input(int N, int* table) {
     for (int i=0; i<N*N; ++i) {
@@ -67,11 +70,18 @@ int main(int argc, char const *argv[])
     int* local_maxes = (int*) malloc(N*N * sizeof(int));
     parse_input(N, table);
 
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+
     partial_sums(N, table);
     find_local_maxes(N, table, local_maxes);
 
     int max = find_max(N, local_maxes);
-    printf("%d\n", max);
+    //printf("%d\n", max);
+
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    std::cout << "test N=" << N << " openmp implementation took " << duration << " us" << std::endl;
 
     free(table);
     free(local_maxes);
