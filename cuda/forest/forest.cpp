@@ -12,10 +12,11 @@ void set_roots(int N, CUdeviceptr parents)
     CUfunction find_roots;
     if (cuModuleGetFunction(&find_roots, module, "find_roots") != CUDA_SUCCESS) { printf("cannot get func find_roots\n"); exit(-1); }
 
+    int chunk = 8;
+    void* args[] = {&N, &chunk, &parents};
 
-    void* args[] = {&parents};
-
-    int blocksX = (N+1023)/1024;
+    //int blocksX = (N+1023)/1024;
+    int blocksX = N/(chunk*1024);
     int threadsBlockX = 1024;
 
     if (cuLaunchKernel(find_roots, blocksX, 1, 1, threadsBlockX, 1, 1, 0, 0, args, 0) != CUDA_SUCCESS) 
