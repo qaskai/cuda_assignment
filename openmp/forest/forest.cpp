@@ -53,9 +53,9 @@ void test(int trees_number, int tree_size, std::string test_name) {
 
 int main(int argc, char const *argv[])
 {
-    test(1, 2048*2048*32, "'forest openmp small'");
-    test(1, 2048*2048*64, "'forest openmp medium'");
-    test(1, 2048*2048*128, "'forest openmp large'");
+    test(1, 2048*2048*2, "'forest openmp small'");
+    test(1, 2048*2048*4, "'forest openmp medium'");
+    test(1, 2048*2048*8, "'forest openmp large'");
 
     //printf("OK :)\n");
     return 0;
