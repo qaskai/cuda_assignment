@@ -1,9 +1,13 @@
 #include <cstdio>
 #include <stdlib.h>
+#include <string>
 
-static int tree_size = 2048;
+#include <iostream>
+#include <chrono>
+using namespace std::chrono;
 
-void gen_forest(int trees_number, int* parents) {
+
+void gen_forest(int trees_number, int tree_size, int* parents) {
     for (int k=0; k<trees_number; ++k) {
         // set root parent to itself
         parents[k*tree_size] = k*tree_size;
@@ -14,7 +18,7 @@ void gen_forest(int trees_number, int* parents) {
     }
 }
 
-void test_correctness(int trees_number, int* parents) {
+void test_correctness(int trees_number, int tree_size, int* parents) {
     for (int i=0; i<trees_number*tree_size; ++i) {
         if (parents[i] != i - (i%tree_size)) {
             printf("FAIL: node %d has parent %d, expected %d\n", i, parents[i], (i-(i%tree_size) ));
@@ -32,19 +36,27 @@ void set_roots(int N, int* parents) {
     }
 }
 
+void test(int trees_number, int tree_size, std::string test_name) {
+	int N = trees_number * tree_size;
+    int* parents_table = (int*) malloc(N * sizeof(int));    
+    gen_forest(trees_number, tree_size, parents_table);
+
+    high_resolution_clock::time_point t1 = high_resolution_clock::now();
+    set_roots(N, parents_table);
+    high_resolution_clock::time_point t2 = high_resolution_clock::now();
+
+    auto duration = duration_cast<microseconds>( t2 - t1 ).count();
+    std::cout << test_name << " openmp implementation took " << duration << " us" << std::endl;
+    free(parents_table);
+    
+}
+
 int main(int argc, char const *argv[])
 {
-    int trees_number;
-    scanf("%d", &trees_number);
-    int N = trees_number * tree_size;
-    
-    int* parents_table = (int*) malloc(N * sizeof(int));    
-    gen_forest(trees_number, parents_table);
+    test(1, 2048*2048*32, "'forest openmp small'");
+    test(1, 2048*2048*64, "'forest openmp medium'");
+    test(1, 2048*2048*128, "'forest openmp large'");
 
-    set_roots(N, parents_table);
-
-    test_correctness(trees_number, parents_table);
-
-    printf("OK :)\n");
+    //printf("OK :)\n");
     return 0;
 }
