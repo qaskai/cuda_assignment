@@ -3,6 +3,9 @@
 #include <climits>
 #include <algorithm>
 
+#include <iostream>
+#include <chrono>
+using namespace std::chrono;
 
 int* bfs(CUdeviceptr graph, int n)
 {
